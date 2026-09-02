@@ -11,6 +11,12 @@ app.get('/', (req, res) => {
   res.send('BackEnd server is running');
 });
 
+app.get("/api/test", (req, res) => {
+  res.json({
+    message: "Hello from TaxSentiment AI Backend 🚀"
+  });
+});
+
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
