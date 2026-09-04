@@ -1,8 +1,51 @@
-import "../index.css";
+import { useState } from "react";
 
 function Dashboard() {
+  const [comment, setComment] = useState("");
+  const [result, setResult] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const analyzeComment = async () => {
+    if (!comment.trim()) return;
+
+    setLoading(true);
+    setResult(null);
+
+    try {
+      const response = await fetch(
+        "http://localhost:3000/api/sentiment/analyze",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            text: comment,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Analysis failed");
+      }
+
+      setResult(data);
+    } catch (error) {
+      console.error("Analysis error:", error);
+
+      setResult({
+        error: "Unable to analyze the comment.",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="app">
+      {/* Sidebar */}
       <aside className="sidebar">
         <div className="logo">
           🧠 <span>TaxSentiment</span>
@@ -18,11 +61,11 @@ function Dashboard() {
           </button>
 
           <button className="nav-item">
-            📁 <span>Dataset Analysis</span>
+            📁 <span>Dataset</span>
           </button>
 
           <button className="nav-item">
-            📈 <span>Model Comparison</span>
+            📈 <span>Analytics</span>
           </button>
 
           <button className="nav-item">
@@ -31,11 +74,14 @@ function Dashboard() {
         </nav>
       </aside>
 
+      {/* Main Content */}
       <main className="main-content">
         <header className="topbar">
           <div>
             <h1>Dashboard</h1>
-            <p>Public sentiment analysis on budgetary tax reforms</p>
+            <p>
+              Public sentiment analysis on budgetary tax reforms
+            </p>
           </div>
 
           <div className="status">
@@ -44,6 +90,7 @@ function Dashboard() {
           </div>
         </header>
 
+        {/* Statistics */}
         <section className="stats-grid">
           <div className="stat-card">
             <span>💬</span>
@@ -70,12 +117,17 @@ function Dashboard() {
           </div>
         </section>
 
+        {/* Dashboard Panels */}
         <section className="dashboard-grid">
+
+          {/* Sentiment Overview */}
           <div className="panel">
             <div className="panel-header">
               <div>
                 <h2>Sentiment Overview</h2>
-                <p>Distribution of analyzed public reactions</p>
+                <p>
+                  Distribution of analyzed public reactions
+                </p>
               </div>
             </div>
 
@@ -85,6 +137,7 @@ function Dashboard() {
             </div>
           </div>
 
+          {/* Quick Analysis */}
           <div className="panel">
             <div className="panel-header">
               <div>
@@ -96,11 +149,52 @@ function Dashboard() {
             <textarea
               className="comment-input"
               placeholder="Enter a comment to analyze..."
+              value={comment}
+              onChange={(event) => setComment(event.target.value)}
             />
 
-            <button className="analyze-btn">
-              🧠 Analyze Sentiment
+            <button
+              className="analyze-btn"
+              onClick={analyzeComment}
+              disabled={loading}
+            >
+              {loading
+                ? "⏳ Analyzing..."
+                : "🧠 Analyze Sentiment"}
             </button>
+
+            {/* Result */}
+            {result && !result.error && (
+              <div className={`analysis-result ${result.sentiment.toLowerCase()}`}>
+                <div className="result-header">
+                  <span>
+                    {result.sentiment === "Positive" && "😊"}
+                    {result.sentiment === "Negative" && "😞"}
+                    {result.sentiment === "Neutral" && "😐"}
+                  </span>
+
+                  <h3>{result.sentiment}</h3>
+                </div>
+
+                <div className="result-details">
+                  <div>
+                    <span>Confidence</span>
+                    <strong>{result.confidence}%</strong>
+                  </div>
+
+                  <div>
+                    <span>Model</span>
+                    <strong>{result.model}</strong>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {result?.error && (
+              <div className="error-message">
+                ❌ {result.error}
+              </div>
+            )}
           </div>
         </section>
       </main>

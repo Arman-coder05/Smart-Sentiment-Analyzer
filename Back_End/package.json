@@ -12,7 +12,10 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@huggingface/transformers": "^4.2.0",
     "cors": "^2.8.6",
-    "express": "^5.2.1"
+    "csv-parse": "^7.0.2",
+    "express": "^5.2.1",
+    "multer": "^2.3.0"
   }
 }
