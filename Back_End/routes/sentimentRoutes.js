@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const analyzeSentiment = require('../services/sentimentService');
 
-router.post("/analyze", (req, res) => {
+router.post("/analyze", async (req, res) => {
   try {
     const { text } = req.body;
 
@@ -12,12 +12,12 @@ router.post("/analyze", (req, res) => {
       });
     }
 
-    const result = analyzeSentiment(text);
+    const result = await analyzeSentiment(text);
 
     res.json({
       text,
       ...result,
-      model: "Temporary Sentiment Engine",
+      model: "Twitter RoBERTa",
     });
   } catch (error) {
     console.error(error);

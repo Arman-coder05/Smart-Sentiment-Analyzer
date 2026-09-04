@@ -23,4 +23,15 @@ async function analyzeWithRoberta(text) {
   return result[0];
 }
 
-module.exports = analyzeWithRoberta;
+async function analyzeMultipleWithRoberta(texts) {
+  const classifier = await getClassifier();
+
+  const results = await classifier(texts);
+
+  return results;
+}
+
+module.exports = {
+  analyzeWithRoberta,
+  analyzeMultipleWithRoberta,
+};

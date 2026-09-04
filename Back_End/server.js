@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
 const { parse } = require('csv-parse/sync');
+const datasetRoutes = require('./routes/datasetRoutes');
 
 const upload = multer({ storage: multer.memoryStorage() });
 
@@ -11,6 +12,7 @@ const port = 3000;
 app.use(cors());
 app.use(express.json());
 app.use("/api/sentiment", require("./routes/sentimentRoutes"));
+app.use("/api/dataset", datasetRoutes);
 
 app.get('/', (req, res) => {
   res.send('BackEnd server is running');
