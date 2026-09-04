@@ -554,3 +554,76 @@ nav {
   font-size: 14px;
   color: #dce5f7;
 }
+.dataset-warning {
+  margin-top: 15px;
+  padding: 14px 18px;
+  border-radius: 10px;
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  color: #fbbf24;
+  font-size: 13px;
+}
+
+/* Analysis Results */
+
+.analysis-results {
+  margin-top: 25px;
+  padding: 25px;
+  border-radius: 18px;
+  background: rgba(13, 30, 65, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.analysis-results-header {
+  margin-bottom: 22px;
+}
+
+.analysis-results-header h2 {
+  font-size: 20px;
+}
+
+.analysis-results-header p {
+  margin-top: 6px;
+  color: #8492ad;
+  font-size: 13px;
+}
+
+.analysis-stats {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+}
+
+.analysis-stat {
+  padding: 18px;
+  border-radius: 14px;
+  background: rgba(3, 10, 28, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.analysis-stat span {
+  font-size: 22px;
+}
+
+.analysis-stat p {
+  margin-top: 10px;
+  color: #8492ad;
+  font-size: 12px;
+}
+
+.analysis-stat h3 {
+  margin-top: 5px;
+  font-size: 22px;
+}
+
+.positive-stat h3 {
+  color: #4ade80;
+}
+
+.neutral-stat h3 {
+  color: #60a5fa;
+}
+
+.negative-stat h3 {
+  color: #f87171;
+}

@@ -1,11 +1,14 @@
 import { useState } from "react";
 
+
 function DatasetAnalysis() {
   const [file, setFile] = useState(null);
   const [dataset, setDataset] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [analyzing, setAnalyzing] = useState(false);
+  const [analysisResults, setAnalysisResults] = useState(null);
+  const [selectedColumn, setSelectedColumn] = useState("");
   const [error, setError] = useState("");
-
   const handleFileChange = async (event) => {
     const selectedFile = event.target.files[0];
 
@@ -35,6 +38,10 @@ function DatasetAnalysis() {
       }
 
       setDataset(data);
+
+      if (data.columns.length > 0) {
+        setSelectedColumn(data.columns[0]);
+      }
     } catch (error) {
       console.error("Upload error:", error);
       setError(error.message);
@@ -43,13 +50,55 @@ function DatasetAnalysis() {
     }
   };
 
+  const analyzeDataset = async () => {
+    if (!file || !selectedColumn) {
+      setError("Please upload a CSV and select a comment column.");
+      return;
+    }
+
+    setAnalyzing(true);
+    setError("");
+    setAnalysisResults(null);
+
+    const formData = new FormData();
+
+    formData.append("file", file);
+    formData.append("column", selectedColumn);
+
+    try {
+      const response = await fetch(
+        "http://localhost:3000/api/dataset/analyze",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Dataset analysis failed");
+      }
+
+      setAnalysisResults(data);
+
+      console.log("Analysis Results:", data);
+    } catch (error) {
+      console.error("Dataset analysis error:", error);
+
+      setError(error.message);
+    } finally {
+      setAnalyzing(false);
+    }
+  };
+
   return (
     <div className="page">
       <div className="page-header">
-          <h1>Dataset Analysis</h1>
-          <p>
-            Upload a CSV file containing public reactions for bulk analysis
-          </p>
+        <h1>Dataset Analysis</h1>
+        <p>
+          Upload a CSV file containing public reactions for bulk analysis
+        </p>
       </div>
 
       {/* Upload Area */}
@@ -135,7 +184,11 @@ function DatasetAnalysis() {
               want to analyze.
             </p>
 
-            <select className="column-select">
+            <select
+              className="column-select"
+              value={selectedColumn}
+              onChange={(event) => setSelectedColumn(event.target.value)}
+            >
               {dataset.columns.map((column) => (
                 <option key={column} value={column}>
                   {column}
@@ -144,7 +197,6 @@ function DatasetAnalysis() {
             </select>
           </div>
 
-          {/* Preview */}
           <div className="preview-panel">
             <div className="panel-header">
               <div>
@@ -178,9 +230,79 @@ function DatasetAnalysis() {
             </div>
           </div>
 
-          <button className="analyze-dataset-btn">
-            🧠 Analyze Dataset
+          <button
+            className="analyze-dataset-btn"
+            onClick={analyzeDataset}
+            disabled={analyzing}
+          >
+
+            {analyzing
+              ? "⏳ Analyzing Dataset..."
+              : "🧠 Analyze Dataset"}
           </button>
+
+          {analysisResults?.limited && (
+            <div className="dataset-warning">
+              ⚠️ Your dataset contains {analysisResults.totalRows} rows.
+              Only the first 500 rows were analyzed in this run.
+            </div>
+
+          )}
+
+          {analysisResults && (
+            <div className="analysis-results">
+
+              <div className="analysis-results-header">
+                <div>
+                  <h2>📊 Analysis Results</h2>
+                  <p>
+                    RoBERTa sentiment analysis of your dataset
+                  </p>
+                </div>
+              </div>
+
+              <div className="analysis-stats">
+
+                <div className="analysis-stat">
+                  <span>💬</span>
+                  <p>Total Rows</p>
+                  <h3>{analysisResults.totalRows}</h3>
+                </div>
+
+                <div className="analysis-stat">
+                  <span>🧠</span>
+                  <p>Analyzed</p>
+                  <h3>{analysisResults.analyzedRows}</h3>
+                </div>
+
+                <div className="analysis-stat positive-stat">
+                  <span>😊</span>
+                  <p>Positive</p>
+                  <h3>
+                    {analysisResults.sentimentCounts.Positive}
+                  </h3>
+                </div>
+
+                <div className="analysis-stat neutral-stat">
+                  <span>😐</span>
+                  <p>Neutral</p>
+                  <h3>
+                    {analysisResults.sentimentCounts.Neutral}
+                  </h3>
+                </div>
+
+                <div className="analysis-stat negative-stat">
+                  <span>😞</span>
+                  <p>Negative</p>
+                  <h3>
+                    {analysisResults.sentimentCounts.Negative}
+                  </h3>
+                </div>
+
+              </div>
+
+            </div>
+          )}
         </div>
       )}
     </div>
