@@ -302,7 +302,64 @@ function DatasetAnalysis() {
               </div>
 
             </div>
+
+
           )}
+          {analysisResults && analysisResults.results && (
+            <div className="results-table-container">
+
+              <div className="results-table-header">
+                <div>
+                  <h2>📋 Analyzed Comments</h2>
+                  <p>
+                    Showing {analysisResults.analyzedRows} analyzed comments
+                  </p>
+                </div>
+              </div>
+
+              <div className="table-scroll">
+                <table className="results-table">
+                  <thead>
+                    <tr>
+                      <th>Comment</th>
+                      <th>Sentiment</th>
+                      <th>Confidence</th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {analysisResults.results.map((row, index) => (
+                      <tr key={index}>
+
+                        <td className="comment-cell">
+                          {row[selectedColumn]}
+                        </td>
+
+                        <td>
+                          <span
+                            className={`sentiment-badge ${row.Sentiment.toLowerCase()}`}
+                          >
+                            {row.Sentiment === "Positive" && "😊"}
+                            {row.Sentiment === "Neutral" && "😐"}
+                            {row.Sentiment === "Negative" && "😞"}
+
+                            {" "}{row.Sentiment}
+                          </span>
+                        </td>
+
+                        <td className="confidence-cell">
+                          {row.Confidence}%
+                        </td>
+
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+            </div>
+          )}
+
         </div>
       )}
     </div>

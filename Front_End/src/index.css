@@ -627,3 +627,90 @@ nav {
 .negative-stat h3 {
   color: #f87171;
 }
+
+.results-table-container {
+  margin-top: 25px;
+  padding: 25px;
+  border-radius: 18px;
+  background: rgba(13, 30, 65, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.results-table-header {
+  margin-bottom: 20px;
+}
+
+.results-table-header h2 {
+  font-size: 20px;
+}
+
+.results-table-header p {
+  margin-top: 6px;
+  color: #8492ad;
+  font-size: 13px;
+}
+
+.table-scroll {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: 12px;
+}
+
+.results-table {
+  width: 100%;
+  min-width: 700px;
+  border-collapse: collapse;
+}
+
+.results-table th,
+.results-table td {
+  padding: 15px 18px;
+  text-align: left;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.results-table th {
+  color: #8492ad;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: rgba(3, 10, 28, 0.5);
+}
+
+.results-table td {
+  color: #dce5f7;
+  font-size: 14px;
+}
+
+.comment-cell {
+  min-width: 450px;
+  max-width: 700px;
+}
+
+.confidence-cell {
+  font-weight: 600;
+}
+
+.sentiment-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.sentiment-badge.positive {
+  color: #4ade80;
+  background: rgba(74, 222, 128, 0.1);
+}
+
+.sentiment-badge.neutral {
+  color: #60a5fa;
+  background: rgba(96, 165, 250, 0.1);
+}
+
+.sentiment-badge.negative {
+  color: #f87171;
+  background: rgba(248, 113, 113, 0.1);
+}
