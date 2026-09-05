@@ -1,3 +1,5 @@
+require('dotenv').config();
+const connectDB = require('./config/db');
 const express = require('express'); 
 const cors = require('cors');
 const multer = require('multer');
@@ -7,10 +9,12 @@ const datasetRoutes = require('./routes/datasetRoutes');
 const upload = multer({ storage: multer.memoryStorage() });
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT;
 
 app.use(cors());
 app.use(express.json());
+
+connectDB();
 app.use("/api/sentiment", require("./routes/sentimentRoutes"));
 app.use("/api/dataset", datasetRoutes);
 
