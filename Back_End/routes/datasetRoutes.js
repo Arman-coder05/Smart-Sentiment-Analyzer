@@ -1,4 +1,5 @@
 const express = require("express");
+const Analysis = require("../models/analysis");
 const multer = require("multer");
 const { parse } = require("csv-parse/sync");
 const {
@@ -49,7 +50,6 @@ router.post("/analyze", upload.single("file"), async (req, res) => {
       });
     }
 
-    // Remove empty comments
     const validRecords = records.filter(
       (row) =>
         row[column] &&
@@ -58,7 +58,6 @@ router.post("/analyze", upload.single("file"), async (req, res) => {
 
     const totalRows = validRecords.length;
 
-    // 🔒 Maximum 500 rows per analysis
     const rowsToAnalyze = validRecords.slice(0, MAX_ROWS);
 
     const texts = rowsToAnalyze.map((row) =>
@@ -91,11 +90,54 @@ router.post("/analyze", upload.single("file"), async (req, res) => {
       };
     });
 
+    const databaseResults = results.map((row) => ({
+      comment: String(row[column]),
+      sentiment: row.Sentiment,
+      confidence: row.Confidence,
+    }));
+
+    const averageConfidence =
+      databaseResults.length > 0
+        ? Number(
+          (
+            databaseResults.reduce(
+              (sum, item) => sum + item.confidence,
+              0
+            ) / databaseResults.length
+          ).toFixed(2)
+        )
+        : 0;
+
     const counts = {
-      Positive: 0,
-      Neutral: 0,
-      Negative: 0,
+      Positive: results.filter(
+        (row) => row.Sentiment === "Positive"
+      ).length,
+
+      Neutral: results.filter(
+        (row) => row.Sentiment === "Neutral"
+      ).length,
+
+      Negative: results.filter(
+        (row) => row.Sentiment === "Negative"
+      ).length,
     };
+
+    const analysis = await Analysis.create({
+      datasetName: req.file.originalname,
+
+      columnName: column,
+
+      totalRows,
+
+      analyzedRows: results.length,
+
+      sentimentCounts: counts,
+
+      averageConfidence,
+
+      results: databaseResults,
+    });
+
 
     results.forEach((row) => {
       counts[row.Sentiment]++;
@@ -103,6 +145,10 @@ router.post("/analyze", upload.single("file"), async (req, res) => {
 
     res.json({
       message: "Dataset analyzed successfully",
+
+      analysisId: analysis._id,
+
+      datasetName: analysis.datasetName,
 
       totalRows,
 
@@ -113,6 +159,8 @@ router.post("/analyze", upload.single("file"), async (req, res) => {
       limited: totalRows > MAX_ROWS,
 
       sentimentCounts: counts,
+
+      averageConfidence,
 
       results,
     });

@@ -1,4 +1,4 @@
-const analyzeWithRoberta = require("./robertaService");
+const { analyzeWithRoberta } = require("./robertaService");
 
 async function analyzeSentiment(text) {
   const result = await analyzeWithRoberta(text);
