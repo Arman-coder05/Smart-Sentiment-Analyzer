@@ -173,4 +173,26 @@ router.post("/analyze", upload.single("file"), async (req, res) => {
   }
 });
 
+router.get("/latest", async (req, res) => {
+  try {
+    const analysis = await Analysis.findOne()
+      .sort({ createdAt: -1 });
+
+    if (!analysis) {
+      return res.status(404).json({
+        message: "No analysis found"
+      });
+    }
+
+    res.json(analysis);
+
+  } catch (error) {
+    console.error("Latest analysis error:", error);
+
+    res.status(500).json({
+      message: "Failed to fetch latest analysis"
+    });
+  }
+});
+
 module.exports = router;
