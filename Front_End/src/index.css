@@ -45,10 +45,12 @@ textarea {
 nav {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  width: 100%;
+
 }
 
 .nav-item {
+  width: 100%;
   border: none;
   background: transparent;
   color: #9ca9c5;
@@ -152,7 +154,6 @@ nav {
 
 .dashboard-grid {
   display: grid;
-  grid-template-columns: 1.4fr 1fr;
   gap: 20px;
 }
 
@@ -713,4 +714,37 @@ nav {
 .sentiment-badge.negative {
   color: #f87171;
   background: rgba(248, 113, 113, 0.1);
+}
+
+.chart-container {
+  width: 100%;
+  height: 350px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.empty-chart {
+  text-align: center;
+  color: #7f8eaa;
+}
+
+.empty-chart div {
+  font-size: 48px;
+  margin-bottom: 10px;
+}
+
+.empty-chart p {
+  font-size: 18px;
+  margin: 0 0 5px;
+}
+
+.empty-chart span {
+  font-size: 14px;
+}
+
+.confidence-grid {
+  display: grid;
+  gap: 20px;
+  margin-top: 20px;
 }

@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 
-function DatasetAnalysis() {
+function DatasetAnalysis({ onNavigate }) {
   const [file, setFile] = useState(null);
   const [dataset, setDataset] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -362,6 +362,12 @@ function DatasetAnalysis() {
 
         </div>
       )}
+      <button
+        className="nav-item"
+        onClick={() => onNavigate("dashboard")}
+      >
+        📊 <span>Dashboard</span>
+      </button>
     </div>
   );
 }

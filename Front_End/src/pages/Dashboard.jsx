@@ -1,9 +1,49 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+} from "recharts";
 
-function Dashboard() {
+function Dashboard({ onNavigate }) {
+  const [analytics, setAnalytics] = useState(null);
+  const [analyticsLoading, setAnalyticsLoading] = useState(true);
   const [comment, setComment] = useState("");
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchAnalytics = async () => {
+      try {
+        const response = await fetch(
+          "http://localhost:3000/api/dataset/latest"
+        );
+
+        if (!response.ok) {
+          throw new Error("No analysis found");
+        }
+
+        const data = await response.json();
+
+        setAnalytics(data);
+      } catch (error) {
+        console.log("Analytics:", error.message);
+        setAnalytics(null);
+      } finally {
+        setAnalyticsLoading(false);
+      }
+    };
+
+    fetchAnalytics();
+  }, []);
 
   const analyzeComment = async () => {
     if (!comment.trim()) return;
@@ -43,6 +83,66 @@ function Dashboard() {
     }
   };
 
+  const positiveCount =
+    analytics?.sentimentCounts?.Positive || 0;
+
+  const neutralCount =
+    analytics?.sentimentCounts?.Neutral || 0;
+
+  const negativeCount =
+    analytics?.sentimentCounts?.Negative || 0;
+
+  const analyzedRows =
+    analytics?.analyzedRows || 0;
+
+  const positivePercentage =
+    analyzedRows
+      ? ((positiveCount / analyzedRows) * 100).toFixed(1)
+      : 0;
+
+  const neutralPercentage =
+    analyzedRows
+      ? ((neutralCount / analyzedRows) * 100).toFixed(1)
+      : 0;
+
+  const negativePercentage =
+    analyzedRows
+      ? ((negativeCount / analyzedRows) * 100).toFixed(1)
+      : 0;
+
+  const sentimentData = [
+    {
+      name: "Positive",
+      value: positiveCount,
+    },
+    {
+      name: "Neutral",
+      value: neutralCount,
+    },
+    {
+      name: "Negative",
+      value: negativeCount,
+    },
+  ];
+  const confidenceData =
+    analytics?.results?.map((item, index) => ({
+      comment: `#${index + 1}`,
+      confidence: item.confidence,
+    })) || [];
+
+  const confidenceValues =
+    analytics?.results?.map((item) => item.confidence) || [];
+
+  const highestConfidence =
+    confidenceValues.length > 0
+      ? Math.max(...confidenceValues)
+      : 0;
+
+  const lowestConfidence =
+    confidenceValues.length > 0
+      ? Math.min(...confidenceValues)
+      : 0;
+
   return (
     <div className="app">
       {/* Sidebar */}
@@ -60,7 +160,9 @@ function Dashboard() {
             💬 <span>Comment Analysis</span>
           </button>
 
-          <button className="nav-item">
+          <button
+            onClick={() => onNavigate("dataset")}
+            className="nav-item">
             📁 <span>Dataset</span>
           </button>
 
@@ -95,25 +197,49 @@ function Dashboard() {
           <div className="stat-card">
             <span>💬</span>
             <p>Total Comments</p>
-            <h2>0</h2>
+            <h2>
+              {analyticsLoading
+                ? "..."
+                : analytics?.analyzedRows ?? 0}
+            </h2>
           </div>
 
           <div className="stat-card positive">
             <span>😊</span>
             <p>Positive</p>
-            <h2>0%</h2>
+            <h2>{positivePercentage}%</h2>
           </div>
 
           <div className="stat-card neutral">
             <span>😐</span>
             <p>Neutral</p>
-            <h2>0%</h2>
+            <h2>{neutralPercentage}%</h2>
           </div>
 
           <div className="stat-card negative">
             <span>😞</span>
             <p>Negative</p>
-            <h2>0%</h2>
+            <h2>{negativePercentage}%</h2>
+          </div>
+          <div className="stat-card">
+            <span>🎯</span>
+            <p>Avg. Confidence</p>
+            <h2>
+              {analytics
+                ? `${analytics.averageConfidence}%`
+                : "0%"}
+            </h2>
+          </div>
+          <div className="stat-card">
+            <span>⬆️</span>
+            <p>Highest Confidence</p>
+            <h2>{highestConfidence.toFixed(2)}%</h2>
+          </div>
+
+          <div className="stat-card">
+            <span>⬇️</span>
+            <p>Lowest Confidence</p>
+            <h2>{lowestConfidence.toFixed(2)}%</h2>
           </div>
         </section>
 
@@ -130,10 +256,41 @@ function Dashboard() {
                 </p>
               </div>
             </div>
+            <div className="chart-container">
+              {analyticsLoading ? (
+                <p>Loading analytics...</p>
+              ) : analytics ? (
+                <ResponsiveContainer width="100%" height={350}>
+                  <PieChart>
+                    <Pie
+                      data={sentimentData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={85}
+                      outerRadius={130}
+                      paddingAngle={4}
+                      dataKey="value"
+                      label={({ percent }) =>
+                        ` ${(percent * 100).toFixed(1)}%`
+                      }
+                    >
+                      <Cell fill="#22c55e" />
+                      <Cell fill="#3b82f6" />
+                      <Cell fill="#ef4444" />
+                    </Pie>
 
-            <div className="chart-placeholder">
-              <span>📊</span>
-              <p>Chart will appear here</p>
+                    <Tooltip />
+
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="empty-chart">
+                  <div>📊</div>
+                  <p>No analysis available</p>
+                  <span>Analyze a dataset to view sentiment distribution.</span>
+                </div>
+              )}
             </div>
           </div>
 
@@ -196,6 +353,52 @@ function Dashboard() {
               </div>
             )}
           </div>
+        </section>
+      <section className="confidence-grid">
+        <div className="panel confidence-panel">
+          <div className="panel-header">
+            <div>
+              <h2>Confidence Analysis</h2>
+              <p>RoBERTa prediction confidence across analyzed comments</p>
+            </div>
+          </div>
+
+          {analytics?.results?.length > 0 ? (
+            <ResponsiveContainer width="100%" height={350}>
+              <LineChart data={confidenceData}>
+                <CartesianGrid strokeDasharray="3 3" />
+
+                <XAxis
+                  dataKey="comment"
+                  interval="preserveStartEnd"
+                />
+
+                <YAxis
+                  domain={[0, 100]}
+                  tickFormatter={(value) => `${value}%`}
+                />
+
+                <Tooltip className="custom-tooltip" contentStyle={{ backgroundColor: "#fff", padding: "10px", color: "#3182BD" }}
+                  formatter={(value) => [`${value}%`, "Confidence"]}
+                />
+
+                <Line
+                  type="monotone"
+                  dataKey="confidence"
+                  strokeWidth={2}
+                  dot={false}
+                />
+
+              </LineChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="empty-chart">
+              <div>🎯</div>
+              <p>No confidence data available</p>
+              <span>Analyze a dataset to view confidence analytics.</span>
+            </div>
+          )}
+        </div>
         </section>
       </main>
     </div>
