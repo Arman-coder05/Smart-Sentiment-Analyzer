@@ -5,6 +5,7 @@ const { parse } = require("csv-parse/sync");
 const {
   analyzeMultipleWithRoberta,
 } = require("../services/robertaService");
+const { generatePDFReport } = require("../services/pdfService");
 
 const router = express.Router();
 
@@ -191,6 +192,37 @@ router.get("/latest", async (req, res) => {
 
     res.status(500).json({
       message: "Failed to fetch latest analysis"
+    });
+  }
+});
+
+router.get("/report", async (req, res) => {
+  try {
+    const analysis = await Analysis.findOne()
+      .sort({ createdAt: -1 });
+
+    if (!analysis) {
+      return res.status(404).json({
+        message: "No analysis available for report generation"
+      });
+    }
+
+    const pdfBuffer = await generatePDFReport(analysis);
+
+    res.set({
+      "Content-Type": "application/pdf",
+      "Content-Disposition":
+        'attachment; filename="sentiment_analysis_report.pdf"',
+      "Content-Length": pdfBuffer.length,
+    });
+
+    res.send(pdfBuffer);
+
+  } catch (error) {
+    console.error("❌ PDF generation error:", error);
+
+    res.status(500).json({
+      message: "Failed to generate PDF report"
     });
   }
 });

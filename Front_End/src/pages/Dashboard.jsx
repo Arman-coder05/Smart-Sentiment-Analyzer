@@ -14,11 +14,25 @@ import {
 } from "recharts";
 
 function Dashboard({ onNavigate }) {
+  const [generatingReport, setGeneratingReport] = useState(false);
+  const [reportGenerated, setReportGenerated] = useState(false);
+  const [reportUrl, setReportUrl] = useState(null);
   const [analytics, setAnalytics] = useState(null);
   const [analyticsLoading, setAnalyticsLoading] = useState(true);
   const [comment, setComment] = useState("");
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  const scrollToSection = (sectionId) => {
+    const section = document.getElementById(sectionId);
+
+    if (section) {
+      section.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+    }
+  };
 
   useEffect(() => {
     const fetchAnalytics = async () => {
@@ -82,6 +96,67 @@ function Dashboard({ onNavigate }) {
       setLoading(false);
     }
   };
+
+  const generateReport = async () => {
+
+    try {
+
+        setGeneratingReport(true);
+
+        const response = await fetch(
+            "http://localhost:3000/api/dataset/report"
+        );
+
+        if (!response.ok) {
+            throw new Error(
+                "Failed to generate PDF report"
+            );
+        }
+
+        const blob = await response.blob();
+
+        const url = window.URL.createObjectURL(blob);
+
+        setReportUrl(url);
+        setReportGenerated(true);
+
+    } catch (error) {
+
+        console.error(
+            "❌ PDF generation error:",
+            error
+        );
+
+        alert(
+            "Unable to generate the PDF report."
+        );
+
+    } finally {
+
+        setGeneratingReport(false);
+
+    }
+};
+
+const downloadReport = () => {
+
+    if (!reportUrl) {
+        return;
+    }
+
+    const link = document.createElement("a");
+
+    link.href = reportUrl;
+
+    link.download =
+        "TaxSentiment_Analysis_Report.pdf";
+
+    document.body.appendChild(link);
+
+    link.click();
+
+    document.body.removeChild(link);
+};
 
   const positiveCount =
     analytics?.sentimentCounts?.Positive || 0;
@@ -148,29 +223,26 @@ function Dashboard({ onNavigate }) {
       {/* Sidebar */}
       <aside className="sidebar">
         <div className="logo">
-          🧠 <span>TaxSentiment</span>
+          🧠 <span>NLP Model</span>
         </div>
-
         <nav>
-          <button className="nav-item active">
-            📊 <span>Dashboard</span>
+          <button className="nav-item" onClick={() => scrollToSection("dashboard")} defaultValue={"active"}>
+            💻 <span>Dashboard</span>
           </button>
 
-          <button className="nav-item">
-            💬 <span>Comment Analysis</span>
+          <button onClick={() => scrollToSection("chart-overview")} className="nav-item">
+            📊 <span>Chart Overview</span>
           </button>
 
-          <button
-            onClick={() => onNavigate("dataset")}
-            className="nav-item">
-            📁 <span>Dataset</span>
+          <button onClick={() => scrollToSection("quick-analysis")} className="nav-item">
+            💬 <span>Quick Analysis</span>
           </button>
 
-          <button className="nav-item">
-            📈 <span>Analytics</span>
+          <button onClick={() => scrollToSection("confidence-analysis")} className="nav-item">
+            📈 <span>Confidence Analysis</span>
           </button>
 
-          <button className="nav-item">
+          <button onClick={() => scrollToSection("reports")} className="nav-item">
             📄 <span>Reports</span>
           </button>
         </nav>
@@ -178,25 +250,67 @@ function Dashboard({ onNavigate }) {
 
       {/* Main Content */}
       <main className="main-content">
-        <header className="topbar">
-          <div>
-            <h1>Dashboard</h1>
-            <p>
-              Public sentiment analysis on budgetary tax reforms
-            </p>
+
+        <div className="topbar-actions">
+
+          <input type="checkbox" id="check" />
+
+          <button className="navigators open">
+            <label htmlFor="check">
+              <span>▼</span>
+            </label>
+          </button>
+
+          <div className="upload-dataset">
+            <h2>Click below to upload dataset</h2>
+
+            <button
+              onClick={() => onNavigate("dataset")}
+              className="Dataset-btn">
+              📁 <span>Upload Dataset</span>
+            </button>
+
+            <button className="close">
+              <label htmlFor="check">
+                <span>▲</span>
+              </label>
+            </button>
+
           </div>
+
+          <p className="upload-instructions" style={{ display: 'relative' }}>
+            Click the icon above to open the upload panel.
+          </p>
+        </div>
+        <header className="topbar">
+          <div id="dashboard">
+            <div>
+              <h1>Dashboard</h1>
+              <p>
+                Public sentiment analysis on budgetary tax reforms
+              </p>
+            </div>
+          </div>
+
 
           <div className="status">
             <span className="status-dot"></span>
             System Online
           </div>
-        </header>
 
+        </header>
         {/* Statistics */}
         <section className="stats-grid">
           <div className="stat-card">
+            <span>🧠</span>
+            <p>Used Model</p>
+            <h2>Twitter-roBERTa
+            </h2>
+          </div>
+
+          <div className="stat-card">
             <span>💬</span>
-            <p>Total Comments</p>
+            <p>Analyzed Comments</p>
             <h2>
               {analyticsLoading
                 ? "..."
@@ -242,19 +356,15 @@ function Dashboard({ onNavigate }) {
             <h2>{lowestConfidence.toFixed(2)}%</h2>
           </div>
         </section>
-
         {/* Dashboard Panels */}
         <section className="dashboard-grid">
-
           {/* Sentiment Overview */}
-          <div className="panel">
+          <div className="panel" id="chart-overview">
             <div className="panel-header">
-              <div>
                 <h2>Sentiment Overview</h2>
                 <p>
                   Distribution of analyzed public reactions
                 </p>
-              </div>
             </div>
             <div className="chart-container">
               {analyticsLoading ? (
@@ -295,12 +405,10 @@ function Dashboard({ onNavigate }) {
           </div>
 
           {/* Quick Analysis */}
-          <div className="panel">
+          <div className="panel" id="quick-analysis">
             <div className="panel-header">
-              <div>
                 <h2>Quick Analysis</h2>
-                <p>Analyze a public reaction</p>
-              </div>
+                <p>Analyze a text</p>
             </div>
 
             <textarea
@@ -353,52 +461,190 @@ function Dashboard({ onNavigate }) {
               </div>
             )}
           </div>
-        </section>
-      <section className="confidence-grid">
-        <div className="panel confidence-panel">
-          <div className="panel-header">
-            <div>
-              <h2>Confidence Analysis</h2>
-              <p>RoBERTa prediction confidence across analyzed comments</p>
-            </div>
+
+          <div className="panel" id="confidence-analysis">
+            <div className="panel-header">
+                <h2>Confidence Analysis</h2>
+                <p>RoBERTa prediction confidence across analyzed comments</p>
+              </div>
+
+            {analytics?.results?.length > 0 ? (
+              <ResponsiveContainer width="100%" height={350}>
+                <LineChart className="line" data={confidenceData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+
+                  <XAxis
+                    dataKey="comment"
+                    interval="preserveStartEnd"
+                  />
+
+                  <YAxis
+                    domain={[0, 100]}
+                    tickFormatter={(value) => `${value}%`}
+                  />
+
+                  <Tooltip className="custom-tooltip" contentStyle={{ backgroundColor: "#fff", color: "#3182BD" }}
+                    formatter={(value) => [`${value}%`, "Confidence"]}
+                  />
+
+                  <Line
+                    dataKey="confidence"
+                    strokeWidth={2}
+                    dot={false}
+                  />
+
+                </LineChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="empty-chart">
+                <div>🎯</div>
+                <p>No confidence data available</p>
+                <span>Analyze a dataset to view confidence analytics.</span>
+              </div>
+            )}
           </div>
 
-          {analytics?.results?.length > 0 ? (
-            <ResponsiveContainer width="100%" height={350}>
-              <LineChart data={confidenceData}>
-                <CartesianGrid strokeDasharray="3 3" />
+          <div className="panel report-panel" id="reports">
 
-                <XAxis
-                  dataKey="comment"
-                  interval="preserveStartEnd"
-                />
+            <div className="panel-header">
 
-                <YAxis
-                  domain={[0, 100]}
-                  tickFormatter={(value) => `${value}%`}
-                />
+              <div>
+                <h2>📄 Generate PDF Report</h2>
 
-                <Tooltip className="custom-tooltip" contentStyle={{ backgroundColor: "#fff", padding: "10px", color: "#3182BD" }}
-                  formatter={(value) => [`${value}%`, "Confidence"]}
-                />
+                <p>
+                  Generate a detailed report from your latest
+                  sentiment analysis.
+                </p>
+              </div>
 
-                <Line
-                  type="monotone"
-                  dataKey="confidence"
-                  strokeWidth={2}
-                  dot={false}
-                />
-
-              </LineChart>
-            </ResponsiveContainer>
-          ) : (
-            <div className="empty-chart">
-              <div>🎯</div>
-              <p>No confidence data available</p>
-              <span>Analyze a dataset to view confidence analytics.</span>
             </div>
-          )}
-        </div>
+
+
+            <div className="report-description">
+
+              <p>
+                Your report contains a comprehensive summary of the
+                analyzed dataset, sentiment distribution, confidence
+                statistics, processing information and detailed
+                classification results.
+              </p>
+
+            </div>
+
+
+            <div className="report-summary">
+
+              <div>
+                <span>Dataset</span>
+                <strong>
+                  {analytics?.totalRows ?? 0} rows
+                </strong>
+              </div>
+
+              <div>
+                <span>Analyzed</span>
+                <strong>
+                  {analytics?.analyzedRows ?? 0} rows
+                </strong>
+              </div>
+
+              <div>
+                <span>Model</span>
+                <strong>
+                  RoBERTa-Twitter
+                </strong>
+              </div>
+
+              <div>
+                <span>Avg. Confidence</span>
+                <strong>
+                  {analytics?.averageConfidence
+                    ? `${analytics.averageConfidence.toFixed(2)}%`
+                    : "0%"}
+                </strong>
+              </div>
+
+              <div>
+                <span>Highest Confidence</span>
+                <strong>
+                  {highestConfidence
+                    ? `${highestConfidence.toFixed(2)}%`
+                    : "0%"}
+                </strong>
+              </div>
+
+              <div>
+                <span>Lowest Confidence</span>
+                <strong>
+                  {lowestConfidence
+                    ? `${lowestConfidence.toFixed(2)}%`
+                    : "0%"}
+                </strong>
+              </div>
+
+            </div>
+
+
+            <div className="report-features">
+
+              <h3>📋 Report Includes</h3>
+
+              <div className="feature-grid">
+
+                <span>✓ Dataset information</span>
+
+                <span>✓ Sentiment distribution</span>
+
+                <span>✓ Positive / Neutral / Negative counts</span>
+
+                <span>✓ Average confidence</span>
+
+                <span>✓ Highest & lowest confidence</span>
+
+                <span>✓ Dataset processing statistics</span>
+
+                <span>✓ Detailed classification results</span>
+
+                <span>✓ Analysis methodology</span>
+
+                <span>✓ Interpretation & conclusion</span>
+
+                <span>✓ Analysis limitations</span>
+
+              </div>
+
+            </div>
+
+
+            <div className="report-actions">
+
+              <button
+                className="report-button"
+                onClick={generateReport}
+                disabled={reportGenerated || generatingReport}
+              >
+                {generatingReport
+                  ? "⏳ Generating PDF..."
+                  : reportGenerated
+                    ? "✅ PDF Generated"
+                    : "📄 Generate PDF Report"}
+              </button>
+
+
+              {reportGenerated && reportUrl && (
+
+                <button
+                  className="download-report-button"
+                  onClick={downloadReport}
+                >
+                  ⬇️ Download PDF
+                </button>
+
+              )}
+
+            </div>
+
+          </div>
         </section>
       </main>
     </div>
