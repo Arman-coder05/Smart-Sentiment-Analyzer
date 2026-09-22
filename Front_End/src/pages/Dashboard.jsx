@@ -223,7 +223,7 @@ const downloadReport = () => {
       {/* Sidebar */}
       <aside className="sidebar">
         <div className="logo">
-          🧠 <span>SentimentAnalyzer</span>
+           <span>🧠 Smart Analyzer</span>
         </div>
         <nav>
           <button className="nav-item" onClick={() => scrollToSection("dashboard")} defaultValue={"active"}>

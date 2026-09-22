@@ -34,6 +34,7 @@ textarea {
 }
 
 .logo {
+  text-align: center;
   font-size: 1.1rem;
   font-weight: 700;
   margin-bottom: 2rem;
@@ -41,7 +42,7 @@ textarea {
 }
 
 .logo span {
-  color: #ef8282;
+  color: #A78BFA;
 }
 
 .sidebar nav {
