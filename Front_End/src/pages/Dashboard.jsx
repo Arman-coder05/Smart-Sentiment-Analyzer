@@ -223,7 +223,7 @@ const downloadReport = () => {
       {/* Sidebar */}
       <aside className="sidebar">
         <div className="logo">
-          🧠 <span>NLP Model</span>
+          🧠 <span>SentimentAnalyzer</span>
         </div>
         <nav>
           <button className="nav-item" onClick={() => scrollToSection("dashboard")} defaultValue={"active"}>
@@ -239,7 +239,7 @@ const downloadReport = () => {
           </button>
 
           <button onClick={() => scrollToSection("confidence-analysis")} className="nav-item">
-            📈 <span>Confidence Analysis</span>
+            📈 <span>Confidence</span>
           </button>
 
           <button onClick={() => scrollToSection("reports")} className="nav-item">
@@ -262,12 +262,11 @@ const downloadReport = () => {
           </button>
 
           <div className="upload-dataset">
-            <h2>Click below to upload dataset</h2>
 
             <button
               onClick={() => onNavigate("dataset")}
               className="Dataset-btn">
-              📁 <span>Upload Dataset</span>
+               <span>Upload Dataset </span>🗁
             </button>
 
             <button className="close">
@@ -279,7 +278,7 @@ const downloadReport = () => {
           </div>
 
           <p className="upload-instructions" style={{ display: 'relative' }}>
-            Click the icon above to open the upload panel.
+            Click the icon above to open the panel.
           </p>
         </div>
         <header className="topbar">
@@ -384,9 +383,9 @@ const downloadReport = () => {
                         ` ${(percent * 100).toFixed(1)}%`
                       }
                     >
-                      <Cell fill="#22c55e" />
-                      <Cell fill="#3b82f6" />
-                      <Cell fill="#ef4444" />
+                      <Cell fill="#34D399" />
+                      <Cell fill="#FBBF24" />
+                      <Cell fill="#FB1785" />
                     </Pie>
 
                     <Tooltip />

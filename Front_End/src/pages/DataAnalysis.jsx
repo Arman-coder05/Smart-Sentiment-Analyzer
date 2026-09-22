@@ -94,6 +94,12 @@ function DatasetAnalysis({ onNavigate }) {
 
   return (
     <div className="page">
+      <button
+        className="dashboard-button"
+        onClick={() => onNavigate("dashboard")}
+      >
+        ⮜<span> Dashboard</span>
+      </button>
       <div className="page-header">
         <h1>Dataset Analysis</h1>
         <p>
@@ -113,7 +119,7 @@ function DatasetAnalysis({ onNavigate }) {
         </p>
 
         <label className="upload-button">
-          📂 Choose CSV File
+          🗁 Upload CSV
           <input
             type="file"
             accept=".csv"
@@ -362,12 +368,6 @@ function DatasetAnalysis({ onNavigate }) {
 
         </div>
       )}
-      <button
-        className="nav-item"
-        onClick={() => onNavigate("dashboard")}
-      >
-        📊 <span>Dashboard</span>
-      </button>
     </div>
   );
 }
