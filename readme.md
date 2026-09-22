@@ -1,171 +1,173 @@
-  # 🧠 TaxSentiment — AI-Based Sentiment Analysis Platform
+# 🧠 Smart Sentiment Analyzer
 
-TaxSentiment is a full-stack web application designed to analyze public reactions to taxation and budgetary reforms using Artificial Intelligence and Natural Language Processing (NLP).
-
-The application allows users to upload a CSV dataset containing textual comments, analyze the data using a RoBERTa-based sentiment classification model, visualize the results through an interactive analytics dashboard, store analysis results in MongoDB, and generate detailed PDF reports.
+A MERN-based sentiment analysis platform that uses **RoBERTa** to analyze sentiment from CSV datasets. The application provides automated sentiment classification, confidence analysis, interactive visualizations, and downloadable PDF reports.
 
 ---
 
-## 🚀 Features
+## 📌 Project Overview
 
-### 📂 Dataset Upload & Analysis
+**Smart Sentiment Analyzer** is a full-stack web application designed to analyze textual data stored in CSV files.
 
-- Upload CSV datasets directly through the web interface.
-- Automatically process the selected text/comment column.
-- Supports large datasets while limiting individual analysis runs to a maximum of 500 rows.
-- Displays analyzed results in a structured table.
-- Provides sentiment classification and confidence scores for individual comments.
+Users can upload a CSV dataset, select the appropriate text column, and analyze the data using a **RoBERTa-based sentiment analysis model**.
 
-### 🤖 AI-Based Sentiment Analysis
-
-TaxSentiment uses a RoBERTa-based sentiment classification model to classify public reactions into:
+The system classifies text into:
 
 - 🟢 Positive
-- 🔵 Neutral
 - 🔴 Negative
+- 🟡 Neutral
 
-Each prediction also includes a confidence score indicating the model's confidence in its classification.
+Along with sentiment classification, the application provides confidence scores, statistical insights, interactive charts, and PDF reports.
 
-### 📊 Interactive Analytics Dashboard
+The project combines the **MERN stack** with a transformer-based NLP model to create a complete sentiment analysis platform.
 
-The dashboard provides an overview of the analyzed dataset through:
+---
 
-- Total comments analyzed
+## ✨ Features
+
+### 📂 CSV Dataset Analysis
+- Upload CSV datasets through the web interface.
+- Select the column containing textual data.
+- Analyze up to **500 rows per analysis**.
+- Display analyzed results in a structured dataset table.
+
+### 🤖 RoBERTa Sentiment Analysis
+- Uses a **RoBERTa-based sentiment classification model**.
+- Automatically classifies textual data as:
+  - Positive
+  - Neutral
+  - Negative
+- Generates confidence scores for individual predictions.
+
+### 📊 Interactive Analytics
+The dashboard provides:
+- Total analyzed rows
 - Positive sentiment percentage
 - Neutral sentiment percentage
 - Negative sentiment percentage
 - Average confidence
 - Highest confidence
 - Lowest confidence
-- Sentiment distribution charts
-- Confidence analytics
+- Confidence distribution
+- Interactive sentiment charts
 
-### 💬 Quick Sentiment Analysis
-
-Users can enter an individual comment directly into the dashboard and receive:
-
-- Predicted sentiment
-- Confidence score
-- Model information
-
-This provides a quick way to test individual text without uploading a complete dataset.
-
-### 🗄️ MongoDB Data Storage
-
-Analysis results are stored in MongoDB, including:
-
-- Dataset information
-- Number of rows
-- Number of analyzed rows
-- Sentiment counts
-- Average confidence
-- Individual analysis results
-- Sentiment labels
-- Confidence values
+### 📈 Data Visualization
+Interactive charts are used to make sentiment results easier to understand and interpret.
 
 ### 📄 PDF Report Generation
-
-TaxSentiment generates detailed PDF reports containing important analytical information such as:
-
+Generate a downloadable PDF report containing:
 - Dataset information
-- Number of rows analyzed
+- Sentiment statistics
 - Sentiment distribution
-- Confidence statistics
-- Highest confidence
-- Lowest confidence
-- Average confidence
-- Model information
-- Methodology
-- Interpretation of results
-- Detailed sentiment results
-- Limitations
-- Conclusion
+- Confidence analytics
+- Highest-confidence result
+- Lowest-confidence result
+- Analysis summary
 
-The PDF generation system also supports a separate manual download workflow.
+### 🗄️ MongoDB Storage
+Analysis results can be stored in MongoDB for persistence and retrieval.
 
-### 🧭 Dashboard Navigation
-
-The dashboard includes navigation between major sections of the application.
-
-Navigation buttons automatically scroll to their corresponding sections, while the active navigation item updates when the user:
-
-- Clicks a navigation option
-- Manually scrolls to a section
+### 🖥️ Dashboard
+A centralized dashboard provides access to:
+- Dataset analysis
+- Quick analysis
+- Sentiment analytics
+- Confidence analytics
+- PDF report generation
 
 ---
 
-# 🛠️ Technology Stack
+## 🛠️ Technology Stack
 
-## Frontend
-
+### Frontend
 - React.js
+- Vite
 - JavaScript
 - HTML5
 - CSS3
 - Recharts
-- Vite
 
-## Backend
-
+### Backend
 - Node.js
 - Express.js
 - JavaScript
-- Multer
-- CSV parsing
 
-## Database
-
+### Database
 - MongoDB
 - Mongoose
 
-## Artificial Intelligence / NLP
-
+### Machine Learning / NLP
 - RoBERTa
 - Hugging Face Transformers
-- Transformers.js
 - ONNX Runtime
 
-## Reporting
-
+### PDF Generation
 - PDFKit
+
+### Development Tools
+- Git
+- GitHub
+- Thunder Client
+- Visual Studio Code
 
 ---
 
-# 🏗️ System Architecture
+## 🧠 Sentiment Analysis Model
+
+The application uses:
+
+**`onnx-community/twitter-roberta-base-sentiment-ONNX`**
+
+This is an ONNX version of the RoBERTa-based sentiment model originally developed by CardiffNLP.
+
+The model processes textual input and produces sentiment predictions with associated confidence scores.
+
+### Sentiment Classes
+
+| Label | Meaning |
+|-------|---------|
+| 🟢 Positive | Positive sentiment |
+| 🟡 Neutral | Neutral or objective sentiment |
+| 🔴 Negative | Negative sentiment |
+
+---
+
+## 🏗️ System Architecture
 
 ```text
-                         ┌─────────────────────┐
-                         │       User          │
-                         └──────────┬──────────┘
-                                    │
-                                    ▼
-                         ┌─────────────────────┐
-                         │    React Frontend   │
-                         │                     │
-                         │ Dashboard           │
-                         │ Dataset Upload      │
-                         │ Analytics           │
-                         │ Charts              │
-                         │ PDF Panel           │
-                         └──────────┬──────────┘
-                                    │
-                              HTTP Requests
-                                    │
-                                    ▼
-                         ┌─────────────────────┐
-                         │   Express Backend   │
-                         │                     │
-                         │ API Routes          │
-                         │ Dataset Processing  │
-                         │ Sentiment Service   │
-                         │ PDF Service         │
-                         └───────┬───────┬─────┘
-                                 │       │
-                   ┌─────────────┘       └──────────────┐
-                   ▼                                    ▼
-          ┌─────────────────┐                  ┌─────────────────┐
-          │    MongoDB      │                  │    RoBERTa      │
-          │                 │                  │ Sentiment Model │
-          │ Analysis Data   │                  │                 │
-          │ Results         │                  │ NLP Inference   │
-          └─────────────────┘                  └─────────────────┘
+                 ┌─────────────────────┐
+                 │      User           │
+                 └──────────┬──────────┘
+                            │
+                            ▼
+                 ┌─────────────────────┐
+                 │   React Frontend    │
+                 │      + Vite         │
+                 └──────────┬──────────┘
+                            │
+                     HTTP Requests
+                            │
+                            ▼
+                 ┌─────────────────────┐
+                 │   Express Backend   │
+                 │     + Node.js       │
+                 └───────┬─────┬───────┘
+                         │     │
+              ┌──────────┘     └──────────┐
+              ▼                           ▼
+     ┌─────────────────┐         ┌─────────────────┐
+     │     MongoDB     │         │    RoBERTa      │
+     │    Database     │         │ Sentiment Model │
+     └─────────────────┘         └────────┬────────┘
+                                         │
+                                         ▼
+                                ┌─────────────────┐
+                                │ Sentiment +     │
+                                │ Confidence      │
+                                │ Results         │
+                                └────────┬────────┘
+                                         │
+                                         ▼
+                                ┌─────────────────┐
+                                │ Analytics + PDF │
+                                │     Reports     │
+                                └─────────────────┘
